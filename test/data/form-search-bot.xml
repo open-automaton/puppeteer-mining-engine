@@ -1,0 +1,11 @@
+<go url="http://localhost:8080">
+    <set form="the_form" target="name" variable="incomingName"></set>
+    <set form="the_form" target="title" variable="incomingTitle"></set>
+    <go form="the_form" method="POST" type="application/json">
+        <set xpath="//table/tr" variable="matches">
+            <set xpath="//td[1]/text()" variable="name"></set>
+            <set xpath="//td[2]/text()" variable="title"></set>
+        </set>
+    </go>
+    <emit variables="matches"></emit>
+</go>

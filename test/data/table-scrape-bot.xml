@@ -1,0 +1,8 @@
+<go url="http://localhost:8080/">
+    <set xpath="//table/tbody/tr" push="true" variable="matches">
+        <set xpath="//td[1]/text()" variable="name"></set>
+        <set xpath="//td[2]/text()" variable="age"></set>
+        <set xpath="//td[3]/text()" variable="location"></set>
+    </set>
+    <emit variables="matches"></emit>
+</go>
