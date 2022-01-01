@@ -22,7 +22,7 @@
     </head>
 
     <body>
-        <form name="the_form" action="/submit">
+        <form name="the_form" action="/submit" method="post">
             <div>
                 <label for="name">Name: </label>
                 <input name="name" id="name" value="">
@@ -30,6 +30,9 @@
             <div>
                 <label for="title">Title: </label>
                 <input name="title" id="title" value="">
+            </div>
+            <div>
+                <input type="submit" name="something_unintuitive" value="Submit">
             </div>
         </form>
     </body>

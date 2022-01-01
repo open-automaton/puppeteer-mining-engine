@@ -4,7 +4,7 @@ const Automaton = require('@open-automaton/automaton');
 const fs = require('fs');
 const express = require('express');
 const bodyParser = require('body-parser');
-const AutomatonCheerioEngine = require('../src/puppeteer.js');
+const AutomatonPuppeteerEngine = require('../src/puppeteer.js');
 
 describe('strip-mine', function(){
     describe('automaton', function(){
@@ -22,7 +22,7 @@ describe('strip-mine', function(){
             );
         });
 
-        it('scrapes a static page', function(done){
+        it.skip('scrapes a static page', function(done){
             let app = express();
             app.get('/', (req, res)=>{
                 res.setHeader('content-type', 'text/html')
@@ -36,7 +36,7 @@ describe('strip-mine', function(){
                     should.not.exist(err);
                     let scraper = new Automaton(
                         body.toString(),
-                        new AutomatonCheerioEngine()
+                        new AutomatonPuppeteerEngine()
                     );
                     scraper.run((err, data)=>{
                         should.not.exist(err);
@@ -75,15 +75,17 @@ describe('strip-mine', function(){
             });
         });
 
-        it.skip('scrapes a form', function(done){
+        it('scrapes a form', function(done){
             let app = express();
-            app.use(bodyParser.json());
+            app.use(bodyParser.urlencoded({extended:false}));
             app.get('/', (req, res)=>{
+                res.setHeader('content-type', 'text/html')
                 res.send(fs.readFileSync(path.join(
                     __dirname, './data/form-search.html'
                 )));
             });
             app.post('/submit', (req, res)=>{
+                res.setHeader('content-type', 'text/html')
                 res.send(fs.readFileSync(path.join(
                     __dirname, './data/form-search-response.html'
                 )).toString()
@@ -103,8 +105,9 @@ describe('strip-mine', function(){
                                 incomingName : 'foo',
                                 incomingTitle: 'bar'
                             }
-                        }, new AutomatonCheerioEngine());
+                        }, new AutomatonPuppeteerEngine());
                         scraper.run((err, data)=>{
+                            console.log(data)
                             data.matches.length.should.equal(2);
 
                             should.exist(data.matches[0]);

@@ -5,8 +5,12 @@
   "description": "A web scraping engine to minimize resource consumption",
   "dependencies": {
     "@open-automaton/automaton-engine": "0.0.3",
+    "async-arrays": "^1.0.1",
     "extended-emitter": "^1.1.0",
     "puppeteer": "^13.0.1"
+  },
+  "scripts": {
+    "test": "./node_modules/mocha/bin/mocha -t 10000"
   },
   "devDependencies": {
     "@open-automaton/automaton": "0.0.4",

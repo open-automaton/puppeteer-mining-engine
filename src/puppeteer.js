@@ -1,5 +1,6 @@
-let AutomatonEngine = require('@open-automaton/automaton-engine/src/automaton-engine.js');
+const AutomatonEngine = require('@open-automaton/automaton-engine/src/automaton-engine.js');
 const Emitter = require('extended-emitter');
+const Arrays = require('async-arrays');
 
 const puppeteer = require('puppeteer');
 
@@ -133,27 +134,53 @@ PuppeteerBrowser.prototype.navigateTo = function(opts, cb){
     if(this.page){
         let url = opts.uri || opts.url;
         if(url){
-            console.log('START', url);
-            this.page.goto(
-                url,
-                //load, networkidle0
-                { waitUntil: 'load' }
-            ).then((result)=>{
-                this.page.evaluate(()=> document.documentElement.outerHTML).then((html)=>{
-                    console.log('!!!!', html);
-                    cb(null, html, this.page);
-                }).catch((ex)=>{
-                    cb(ex);
+            if(opts.form && opts.data && opts.submit){
+                Arrays.forEachEmission(Object.keys(opts.data), (key, i, done)=>{
+                    this.page.type(`*[name="${key}"]`, opts.data[key]).then(()=>{
+                        done();
+                    }).catch((ex)=>{
+                        throw ex;
+                    });
+                }, ()=>{
+                    this.page.click(`input[name="${opts.submit}"]`).then(()=>{
+                        this.page.waitForNavigation().then(()=>{
+                            this.page.evaluate(
+                                ()=> document.documentElement.outerHTML
+                            ).then((html)=>{
+                                cb(null, html, this.page);
+                            }).catch((ex4)=>{
+                                cb(ex4);
+                            });
+                        }).catch((ex3)=>{
+                            throw ex3;
+                        });;
+                    }).catch((ex2)=>{
+                        throw ex2;
+                    });
+                    console.log('*********')
                 });
-            }).catch((err)=>{
-                console.log('ERROR2', err);
-                cb(err)
-            });
+            }else{
+                this.page.goto(
+                    url,
+                    //load, networkidle0
+                    { waitUntil: 'load' }
+                ).then((result)=>{
+                    this.page.evaluate(
+                        ()=> document.documentElement.outerHTML
+                    ).then((html)=>{
+                        cb(null, html, this.page);
+                    }).catch((ex)=>{
+                        cb(ex);
+                    });
+                }).catch((err)=>{
+                    console.log('ERROR2', err);
+                    cb(err)
+                });
+            }
         }else{
             //handle form navigation
         }
     }else{
-        console.log('BINNED');
         this.jobs.push(()=>{
             this.navigateTo(opts, cb);
         })

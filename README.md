@@ -2,3 +2,9 @@
 =======================================
 
 A headless chrome instance to scrape through using [automaton](https://www.npmjs.com/package/@open-automaton/automaton). 
+
+Testing
+-------
+```bash
+    npm run test
+```
