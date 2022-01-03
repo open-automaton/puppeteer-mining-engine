@@ -32,17 +32,15 @@ var getBrowser = function(options, browsers, index, name, cb){
 }
 
 const cleanupBrowsers = function(browsers, cb){
-    asynk.eachOfLimit(browsers, browsers.length, function(browser, index, done){
+    Arrays.forEachEmission(browsers, function(browser, index, done){
         var attempts = 0;
-        var maxAttempts = 2;
-        var interval = 1000;
+        var maxAttempts = 3;
+        var interval = 2000;
         var ensureShutdown = function(cb){
             if(browser && browser.process() != null){
                 if(attempts > maxAttempts){
-                    setTimeout(function(){
-                        process.exit();
-                    }, 100);
-                    throw new Error('Cannot shut browser down');
+                    //throw new Error('Cannot shut browser down');
+                    return cb(new Error('Cannot shut browser down'));
                 }
                 browser.process().kill('SIGINT');
                 attempts++;
@@ -52,7 +50,7 @@ const cleanupBrowsers = function(browsers, cb){
             }else cb();
         }
         browser.pages().then(function(pages){
-            asynk.eachOfLimit(pages, pages.length, function(page, i, pageDone){
+            Arrays.forEachEmission(pages, function(page, i, pageDone){
                 page.close().then(function(){
                     pageDone();
                 });
@@ -79,11 +77,13 @@ let PuppeteerBrowser = function(opts){
     if(options.args) options.args = options.args.concat(puppeteerArgs);
     else options.args = puppeteerArgs;
     this.jobs = [];
+    this.browsers = [];
     puppeteer.launch({
         args : options.args,
         headless: !options.debug
     }).then((instance)=>{
         this.instance = instance;
+        this.browsers.push(instance)
         instance.newPage().then((page)=>{
             this.page = page;
             let jobs = this.jobs;
@@ -192,7 +192,11 @@ Automaton.PuppeteerEngine = AutomatonEngine.extend({
         });
     },
     cleanup : function(cb){
-        cleanupBrowsers([this.browser], cb);
+        let cleanableBrowsers = [];
+        if(this.browser && this.browser.instance) cleanableBrowsers.push(
+            this.browser.instance
+        );
+        cleanupBrowsers(cleanableBrowsers, cb);
     },
     xpathText : function(opts, cb){
         this.browser.xpath(opts, (err, result)=>{
