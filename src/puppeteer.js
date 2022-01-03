@@ -81,7 +81,7 @@ let PuppeteerBrowser = function(opts){
     this.jobs = [];
     puppeteer.launch({
         args : options.args,
-        headless: false
+        headless: !options.debug
     }).then((instance)=>{
         this.instance = instance;
         instance.newPage().then((page)=>{
@@ -142,22 +142,20 @@ PuppeteerBrowser.prototype.navigateTo = function(opts, cb){
                         throw ex;
                     });
                 }, ()=>{
-                    this.page.click(`input[name="${opts.submit}"]`).then(()=>{
-                        this.page.waitForNavigation().then(()=>{
-                            this.page.evaluate(
-                                ()=> document.documentElement.outerHTML
-                            ).then((html)=>{
-                                cb(null, html, this.page);
-                            }).catch((ex4)=>{
-                                cb(ex4);
-                            });
-                        }).catch((ex3)=>{
-                            throw ex3;
-                        });;
-                    }).catch((ex2)=>{
-                        throw ex2;
+                    Promise.all([
+                       this.page.waitForNavigation(),
+                       this.page.click(`input[name="${opts.submit}"]`)
+                    ]).then(()=>{
+                        this.page.evaluate(
+                            ()=> document.documentElement.outerHTML
+                        ).then((html)=>{
+                            cb(null, html, this.page);
+                        }).catch((ex4)=>{
+                            cb(ex4);
+                        });
+                    }).catch((ex3)=>{
+                        throw ex3;
                     });
-                    console.log('*********')
                 });
             }else{
                 this.page.goto(
