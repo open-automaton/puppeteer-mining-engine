@@ -1,13 +1,15 @@
 {
   "name": "@open-automaton/puppeteer-mining-engine",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "main": "src/puppeteer.js",
   "description": "A web scraping engine to minimize resource consumption",
   "dependencies": {
     "@open-automaton/automaton-engine": "0.0.5",
     "async-arrays": "^1.0.1",
     "extended-emitter": "^1.1.0",
-    "puppeteer": "^13.0.1"
+    "puppeteer": "^13.0.1",
+    "puppeteer-extra": "^3.2.3",
+    "puppeteer-extra-plugin-stealth": "^2.9.0"
   },
   "scripts": {
     "test": "./node_modules/mocha/bin/mocha -t 10000"

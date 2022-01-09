@@ -2,7 +2,12 @@ const AutomatonEngine = require('@open-automaton/automaton-engine/src/automaton-
 const Emitter = require('extended-emitter');
 const Arrays = require('async-arrays');
 
-const puppeteer = require('puppeteer');
+//const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-extra')
+
+// add stealth plugin and use defaults (all evasion techniques)
+const StealthPlugin = require('puppeteer-extra-plugin-stealth')
+puppeteer.use(StealthPlugin())
 
 const puppeteerArgs = [
     '--enable-features=NetworkService',
@@ -79,7 +84,7 @@ let PuppeteerBrowser = function(opts){
     this.jobs = [];
     this.browsers = [];
     puppeteer.launch({
-        args : options.args,
+        //args : options.args,
         headless: !options.debug
     }).then((instance)=>{
         this.instance = instance;
